@@ -2,20 +2,19 @@
 
 set -e
 
-DATADIR="/var/lib/mysql"
+mkdir -p /run/mysqld
 
-echo "Initializing MariaDB..."
+chown mysql:mysql /run/mysqld
 
-# if [ ! -d "$DATADIR/mysql" ]; then
-
-#     echo "Initializing database directory..."
-
-#     mariadb-install-db --user=mysql --datadir="$DATADIR"
-
-# fi
+su -s /bin/bash mysql -c "mariadbd &"
 
 
-echo "starting temporary mariaDB server..."
+while !mysqladmin ping -h localhost --silent
+do
+	sleep 1
+done
+
+mysql -e "CREATE DATABASE IF NOT EXISTS wordpress;"
 
 # mysqld --user=mysql --datadir="$DATADIR" --skip-networking &
 
@@ -50,7 +49,7 @@ echo "starting temporary mariaDB server..."
 
 
 # # wait "$MYSQL_PID"
-sleep 1000000000
+sleep 10000000000000000
 # echo "Starting MariaDB..."
 
 # exec mysqld --user=mysql --datadir="$DATADIR"
