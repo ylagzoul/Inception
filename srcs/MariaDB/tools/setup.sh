@@ -1,55 +1,31 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 mkdir -p /run/mysqld
 
 chown mysql:mysql /run/mysqld
 
-su -s /bin/bash mysql -c "mariadbd &"
+su -s /bin/bash mysql -c "mariadbd" &
 
+MYSQL_PID=$!
 
-while !mysqladmin ping -h localhost --silent
+while ! mysqladmin ping -h localhost --silent
 do
 	sleep 1
 done
 
-mysql -e "CREATE DATABASE IF NOT EXISTS wordpress;"
+USER=ylagzoul
+DATABASE=wordpress
 
-# mysqld --user=mysql --datadir="$DATADIR" --skip-networking &
+mysql -e "CREATE DATABASE IF NOT EXISTS $DATABASE;"
 
+mysql -e "CREATE USER IF NOT EXISTS '$USER'@'%';"
 
-# MYSQL_PID=$!
+mysql -e "GRANT ALL PRIVILEGES ON $DATABASE.* TO '$USER'@'%';"
 
-# echo "waiting for mariaDB...."
+mariadb-admin shutdown
 
-# until mariadb-admin ping --silent; do 
-#     sleep 1
-# done
+wait "$MYSQL_PID"
 
-# echo "mariaDB is ready ."
-
-# MYSQL_DATABASE="wordpress"
-# MYSQL_USER="youssef"
-# MYSQL_PASSWORD="you123"
-
-# mariadb <<EOF
-# CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}`;
-
-# CREATE USER IF NOT EXTSTS '${MYSQL_USER}'@'%' IDENTIED BY '${MYSQL_PASSWORD}';
-
-# GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO '${MYSQL_USER}'@'%';
-
-# FLUSH PRIVILEGES;
-# EOF
-
-# echo "Stopping temporary mariaDB..."
-
-# mariadb-admin shutdown
-
-
-# # wait "$MYSQL_PID"
-sleep 10000000000000000
-# echo "Starting MariaDB..."
-
-# exec mysqld --user=mysql --datadir="$DATADIR"
+exec mariadbd --user=mysql
