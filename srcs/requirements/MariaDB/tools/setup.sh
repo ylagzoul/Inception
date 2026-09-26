@@ -16,13 +16,19 @@ do
 done
 
 USER=ylagzoul
-DATABASE=wordpress
 
-mysql -e "CREATE DATABASE IF NOT EXISTS $DATABASE;"
 
-mysql -e "CREATE USER IF NOT EXISTS '$USER'@'%';"
 
-mysql -e "GRANT ALL PRIVILEGES ON $DATABASE.* TO '$USER'@'%';"
+DB_NAME=wordpress
+DB_USER=ylagzoul
+DB_PASSWORD=123
+DB_HOST=mariadb
+
+mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+
+mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
+
+mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';"
 
 mariadb-admin shutdown
 

@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:bookworm
 
 RUN apt-get update \
 	&& apt-get install -y mariadb-server\
@@ -11,4 +11,4 @@ COPY tools/setup.sh  /setup.sh
 RUN chmod 755 /setup.sh
 
 
-ENTRYPOINT ["/setup.sh","sleep","1000000000000"]
+ENTRYPOINT ["/setup.sh"]
