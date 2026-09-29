@@ -2,6 +2,8 @@
 
 set -ex
 
+DB_PASSWORD=$(cat /run/secrets/db_password)
+
 mkdir -p /run/mysqld
 
 chown mysql:mysql /run/mysqld
@@ -14,15 +16,6 @@ while ! mysqladmin ping -h localhost --silent
 do
 	sleep 1
 done
-
-USER=ylagzoul
-
-
-
-DB_NAME=wordpress
-DB_USER=ylagzoul
-DB_PASSWORD=123
-DB_HOST=mariadb
 
 mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 
