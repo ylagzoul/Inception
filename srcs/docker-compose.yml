@@ -1,9 +1,8 @@
-
+# KHassk dir image name 
 services:
 
   nginx:
-    build:
-      context: ./requirements/nginx
+    build:  ./requirements/nginx
     image: nginx-inception
     ports:
       - "443:443"
@@ -14,13 +13,13 @@ services:
       - wordpress
 
   wordpress:
-    build:
-      context: ./requirements/WordPress
+    build: ./requirements/WordPress
     image: wordpress-inception
     networks:
       - inception
     volumes:
       - wordpress_data:/var/www/html
+    # I need to just put the file of env give me another way to do this 
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
@@ -29,16 +28,13 @@ services:
       WP_TITLE: ${WP_TITLE}
       WP_ADMIN_USER: ${WP_ADMIN_USER}
       WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
-    secrets:
-      - db_password
+      
     restart: always
     depends_on:
-      mariadb:
-        condition: service_healthy
+      - mariadb
 
   mariadb:
-    build:
-      context: ./requirements/MariaDB
+    build: ./requirements/MariaDB
     image: mariadb-inception
     networks:
       - inception
@@ -47,27 +43,14 @@ services:
     environment:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
-    secrets:
-      - db_password
-      - db_root_password
     restart: always
-    healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "--silent"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 30s
 
 networks:
   inception:
 
+# need to do a bind month for these volumes 
 volumes:
   mariadb_data:
   wordpress_data:
 
-secrets:
-  db_password:
-    file: ../secrets/db_password.txt
 
-  db_root_password:
-    file: ../secrets/db_root_password.txt

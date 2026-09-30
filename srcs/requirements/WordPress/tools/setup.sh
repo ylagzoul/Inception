@@ -2,7 +2,6 @@
 
 set -ex
 
-DB_PASSWORD=$(cat /run/secrets/db_password)
 
 # Wait for MariaDB
 # I need to wait it with ping ...
