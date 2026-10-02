@@ -1,0 +1,29 @@
+DATA_PATH = /home/ylagzoul/data
+
+COMPOSE = docker compose -f srcs/docker-compose.yml
+
+all :
+	sudo mkdir -p $(DATA_PATH)/mariadb
+	sudo mkdir -p $(DATA_PATH)/wordpress
+	$(COMPOSE) up --build -d
+
+
+up : 
+	$(COMPOSE) up --build -d
+
+build :
+	$(COMPOSE) build
+
+down :
+	$(COMPOSE) down
+ps :
+	$(COMPOSE) ps
+
+clean :
+	$(COMPOSE) down --rmi all
+
+fclean: clean
+	$(COMPOSE) down --volumes
+	sudo rm -rf $(DATA_PATH)
+
+re : fclean all

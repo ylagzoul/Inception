@@ -9,6 +9,6 @@ RUN mkdir -p /etc/nginx/ssl && \
         -out /etc/nginx/ssl/server.crt \
         -subj "/CN=ylagzoul.42.fr"
 
-COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]

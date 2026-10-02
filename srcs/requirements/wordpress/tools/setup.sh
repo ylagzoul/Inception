@@ -1,18 +1,12 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 
 # Wait for MariaDB
-# I need to wait it with ping ...
-until php -r "
-\$connection = @mysqli_connect('$DB_HOST', '$DB_USER', '$DB_PASSWORD', '$DB_NAME');
-if (!\$connection) {
-    exit(1);
-}
-"; do
-    echo "Waiting for MariaDB..."
-    sleep 2
+while ! mysqladmin ping -h mariadb --silent
+do
+	sleep 1
 done
 
 if [ ! -f /var/www/html/wp-load.php ]; then
@@ -29,11 +23,8 @@ if [ ! -f /var/www/html/wp-config.php ]; then
         --dbhost="$DB_HOST" \
         --path=/var/www/html \
         --allow-root
-
 fi
 
-
-# Install WordPress
 if ! wp core is-installed \
     --path=/var/www/html \
     --allow-root
@@ -48,14 +39,15 @@ then
         --path=/var/www/html \
         --allow-root
 
-    # how to add a author user in wordpress 
+    wp user create "$WP_USER" "$WP_USER_EMAIL" \
+        --role=author \
+        --user_pass="$WP_USER_PASSWORD" \
+        --path=/var/www/html \
+        --allow-root
 
 fi
-
 
 # Permissions
 # chown -R www-data:www-data /var/www/html
 
-
-# Start PHP-FPM
-exec php-fpm8.4 -F
+exec php-fpm8.2 -F
