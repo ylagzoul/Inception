@@ -4,9 +4,9 @@ services:
   nginx:
     container_name: nginx
     build:  ./requirements/nginx
-    image: nginx:1.0
+    image: nginx:1337
     ports:
-      - "305:305"
+      - "443:443"
     networks:
       - inception
     volumes:
@@ -18,7 +18,7 @@ services:
   wordpress:
     container_name: wordpress
     build: ./requirements/wordpress
-    image: wordpress:1.0
+    image: wordpress:1337
     networks:
       - inception
     volumes:
@@ -34,7 +34,7 @@ services:
   mariadb:
     container_name: mariadb
     build: ./requirements/mariadb
-    image: mariadb:1.0 
+    image: mariadb:1337
     networks:
       - inception
     volumes:

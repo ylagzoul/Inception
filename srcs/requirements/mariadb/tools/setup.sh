@@ -6,7 +6,10 @@ mkdir -p /run/mysqld
 
 chown mysql:mysql /run/mysqld
 
-su -s /bin/bash mysql -c "mariadbd" &
+su -s /bin/bash mysql -c "mariadbd" & # مشكل في ان لاينبغي ان تكون اي عمليه في الخلفيه
+# subject - Examine the Dockerfiles. If you see 'tail -f' or any command run in background in any of them in the 
+# subject - ENTRYPOINT section, the evaluation ends now. Same thing if 'bash' or 'sh' are used but not for running a script (e.g, 'nginx & bash' or 'bash').
+
 
 MYSQL_PID=$!
 
@@ -29,4 +32,4 @@ mariadb-admin shutdown
 
 wait "$MYSQL_PID"
 
-exec mariadbd --user=mysql
+exec mariadbd --user=mysql --bind-address=0.0.0.0 --port=3306
