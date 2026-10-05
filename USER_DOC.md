@@ -107,41 +107,33 @@ Credentials are the usernames and passwords the services need to work. Sensitive
 
 | Type | Location | Content |
 | ---- | -------- | ------- |
-| Environment variables | `srcs/.env` | Non-sensitive values: domain name, database name, usernames |
-| Secrets | `secrets/` (repository root) | Passwords, one per file |
+| Environment variables | `srcs/.env` | Non-sensitive values: domain name, database name, usernames ,Passwords|
 
 Example of the `.env` file content:
 
 ```text
-DOMAIN_NAME
-MYSQL_DATABASE
-MYSQL_USER
+DB_NAME=wordpress
+DB_USER=ylagzoul
+DB_PASSWORD=xxxxxx
+ROOT_PASSWORD=xxxxx
+DB_HOST=mariadb
 ```
 
-Example of the `secrets/` directory:
-
-```text
-secrets/
-├── db_password.txt
-└── db_root_password.txt
-```
-
-Docker makes each secret available inside the containers as a file under `/run/secrets/`.
 
 ## WordPress accounts
 
-The WordPress administrator and the regular user are created automatically at the first start. Their usernames are defined in `srcs/.env`, and their passwords in the `secrets/` directory. The administrator username does not contain the word "admin", as required by the project rules.
+The WordPress administrator and the regular user are created automatically at the first start. Their usernames and passwords are defined in `srcs/.env`. The administrator username does not contain the word "admin", as required by the project rules.
 
 ## Changing a password
 
-1. Edit the corresponding file in `secrets/` (or the value in `srcs/.env`).
+1. Edit the corresponding file the value in `srcs/.env`.
 2. Run `make fclean`, then `make`, to recreate the stack.
 
 > **Warning:** `make fclean` deletes the existing website and database data. The database keeps its old password until it is recreated, so a simple restart is not enough.
 
 ## Keeping credentials safe
 
-* Never share or publish the `secrets/` directory or the `.env` file.
+* Never share or publish the `.env` file.
 * Both are ignored by Git and must stay out of the repository.
 
 ---

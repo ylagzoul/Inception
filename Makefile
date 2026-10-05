@@ -3,8 +3,8 @@ DATA_PATH = /home/ylagzoul/data
 COMPOSE = docker compose -f srcs/docker-compose.yml
 
 all :
-	sudo mkdir -p $(DATA_PATH)/mariadb
-	sudo mkdir -p $(DATA_PATH)/wordpress
+	mkdir -p $(DATA_PATH)/mariadb
+	mkdir -p $(DATA_PATH)/wordpress
 	$(COMPOSE) up --build -d
 
 

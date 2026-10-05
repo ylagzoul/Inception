@@ -2,34 +2,41 @@
 
 set -e
 
+#
+DB_NAME=wordpress
+DB_USER=ylagzoul
+DB_PASSWORD=data123
+ROOT_PASSWORD=root123
+DB_HOST=mariadb
+#
+
 mkdir -p /run/mysqld
 
 chown mysql:mysql /run/mysqld
 
-su -s /bin/bash mysql -c "mariadbd" & # مشكل في ان لاينبغي ان تكون اي عمليه في الخلفيه
-# subject - Examine the Dockerfiles. If you see 'tail -f' or any command run in background in any of them in the 
-# subject - ENTRYPOINT section, the evaluation ends now. Same thing if 'bash' or 'sh' are used but not for running a script (e.g, 'nginx & bash' or 'bash').
+if [ ! -d "/var/lib/mysql/$DB_NAME" ] ; then
 
+service mariadb start
 
-MYSQL_PID=$!
+until mariadb-admin ping --silent; do
+        sleep 1
+    done
 
-while ! mysqladmin ping -h localhost --silent
-do
-	sleep 1
-done
+mariadb -u root  << EOF
+CREATE DATABASE $DB_NAME;
+CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
+GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';
+ALTER USER root@localhost IDENTIFIED BY '${ROOT_PASSWORD}';
+FLUSH PRIVILEGES;
+EOF
 
-# khass tzid password l root
-# mariadb -u root -p"$MYSQL_ROOT_PASSWORD" << EOF
-mysql -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+    mariadb-admin -u root -p"$ROOT_PASSWORD" shutdown
 
-mysql -e "CREATE USER IF NOT EXISTS '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
+    while mariadb-admin -u root -p"$ROOT_PASSWORD" ping --silent 2>/dev/null; do
+        sleep 1
+    done
+fi
 
-mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%';"
-
-#FLUSH PRIVILEGES;
-#EOF
-mariadb-admin shutdown
-
-wait "$MYSQL_PID"
+echo "Maraidb is running !!"
 
 exec mariadbd --user=mysql --bind-address=0.0.0.0 --port=3306
