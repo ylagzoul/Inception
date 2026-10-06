@@ -2,19 +2,19 @@
 
 set -e
 
-
-# Wait for MariaDB
-while ! mysqladmin ping -h mariadb --silent
+while ! mariadb-admin ping --host=mariadb --port=3306 --silent
 do
 	sleep 1
 done
 
-if [ ! -f /var/www/html/wp-load.php ]; then
+if [ ! -f /var/www/html/wp-load.php ]
+then
     wp core download --path=/var/www/html --allow-root
 fi
 
 # Create wp-config.php
-if [ ! -f /var/www/html/wp-config.php ]; then
+if [ ! -f /var/www/html/wp-config.php ]
+then
 
     wp config create \
         --dbname="$DB_NAME" \
@@ -25,9 +25,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
         --allow-root
 fi
 
-if ! wp core is-installed \
-    --path=/var/www/html \
-    --allow-root
+if ! wp core is-installed --path=/var/www/html --allow-root
 then
 
     wp core install \

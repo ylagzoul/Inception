@@ -231,7 +231,91 @@ docker exec <container> mariadb -u root -p -e "SHOW VARIABLES LIKE 'port';"
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
+## الدخول للـ database
 
+### 1. دخل لحاوية MariaDB
+
+```bash
+docker exec -it mariadb bash
+```
+(`mariadb` هنا هو اسم الحاوية. تقدر تشوفو بـ `docker ps`.)
+
+### 2. دخل لـ MariaDB
+
+```bash
+mariadb -u "$DB_USER" -p
+```
+وكتب كلمة السر. أو بالقيم مباشرة:
+```bash
+mariadb -u wpuser -p wordpress
+```
+إلا بغيتي صلاحيات كاملة، دخل بـ root:
+```bash
+mariadb -u root -p
+```
+
+أو مباشرة من برا بأمر واحد، بلا ما تدخل للحاوية:
+```bash
+docker exec -it mariadb mariadb -u wpuser -p
+```
+
+### 3. اختار الـ database
+
+```sql
+SHOW DATABASES;
+USE wordpress;
+SHOW TABLES;
+```
+(`wordpress` هو `$DB_NAME`.)
+
+## أوامر SQL للجداول
+
+**`wp_users`** (المستخدمين):
+```sql
+SELECT ID, user_login, user_email, user_registered FROM wp_users;
+```
+
+**`wp_usermeta`** (الأدوار والمعلومات الإضافية):
+```sql
+SELECT user_id, meta_key, meta_value
+FROM wp_usermeta
+WHERE meta_key = 'wp_capabilities';
+```
+هنا غادي تشوف الدور ديال كل مستخدم (`administrator`, `author`).
+
+**`wp_options`** (إعدادات الموقع):
+```sql
+SELECT option_name, option_value
+FROM wp_options
+WHERE option_name IN ('siteurl', 'home', 'blogname', 'admin_email');
+```
+
+## ربط المستخدم بالدور (JOIN)
+
+```sql
+SELECT u.user_login, u.user_email, m.meta_value AS role
+FROM wp_users u
+JOIN wp_usermeta m ON u.ID = m.user_id
+WHERE m.meta_key = 'wp_capabilities';
+```
+هادي كتعطيك: اسم المستخدم، الإيميل، والدور فجدول واحد. هادشي مزيان تعرضو للمصحح.
+
+## ملاحظات
+
+- **كلمة السر** فـ `user_pass` غادي تبان hash طويل (`$P$B...`)، ماشي النص الأصلي.
+- الـ prefix `wp_` هو الافتراضي. إلا كان مختلف، شوف:
+  ```sql
+  SHOW TABLES;
+  ```
+- إلا طلعلك `Access denied`، تأكد أن المستخدم والكلمة السر هما نفس اللي صاوبتي فسكريبت MariaDB.
+- ولي ما بغيتيش تدخل فالـ SQL، تقدر تستعمل WP-CLI:
+  ```bash
+  wp user list --path=/var/www/html --allow-root
+  ```
+
+## جواب قصير للمصحح
+
+> "I enter the MariaDB container with `docker exec`, connect with `mariadb -u <user> -p`, select the WordPress database with `USE`, and run SQL queries. For example, `SELECT * FROM wp_users;` shows the admin and the author I created."
 -------------------------------------------------------------------------------------------------
 
 what is mariadb and mysqladmin and  mariadbd and mysql and mariadb-server and mysqld? what is defirent 
